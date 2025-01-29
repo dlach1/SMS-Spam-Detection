@@ -1,6 +1,7 @@
 import string
 import email
 import math
+import numpy as np
 from collections import defaultdict
 
 TRAINING_SET_RATIO = 0.7
@@ -66,7 +67,8 @@ for doc in test:
 # print("Term Frequency (TF) for each term in the training set:", train_tf)
 # print("Term Frequency (TF) for each term in the test set:", test_tf)
 
-# Calculate the TF-IDF for each term in the train set
+# Calculate the TF-IDF for each term in the
+train set
 train_tfidf = []
 for doc_tf in train_tf:
     doc_tfidf = {term: tf * idf[term] for term, tf in doc_tf.items()}
@@ -74,3 +76,18 @@ for doc_tf in train_tf:
 
 print("TF-IDF for each term in the training set:", train_tfidf)
 
+def euclidean_distance(vec1, vec2): 
+    return np.sqrt(sum((vec1[term] - vect2[term]) ** 2 for term in vec1))
+
+def k_nearest_neighbors(train_tf_idf, train_labels, test_vector, k=5):
+    distance = []
+
+    for i, train_vector in enumerate(train_tf_idf):
+        distance = euclidean_distance(train_vector, test_vector)
+        distances.append((distance, train_labels[i]))
+
+    distances.sort(key=lambda x: x[0])
+    k_nearest - distances[:k]
+
+    labels = [label for _, label in k_nearest]
+    return max(set(labels), key=labels.count)
