@@ -56,3 +56,9 @@ def inverse_document_frequency(docs):
 idf = inverse_document_frequency(train)
 print(idf)
 
+# Calculate TF for the training set
+tf = term_frequency(train)
+
+# Calculate TF-IDF for the training set
+tf_idf = td * idf
+
