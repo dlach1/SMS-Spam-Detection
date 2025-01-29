@@ -4,6 +4,7 @@ import math
 from collections import defaultdict
 
 TRAINING_SET_RATIO = 0.7
+TOTAL_SET = 0.01
 
 # Read all the lines in SMSSpamCollection to a list
 file_path = 'SMSSpamCollection'
@@ -27,8 +28,8 @@ for tokens in words:
 words = cleaned_words
 
 # Split the data into training and test sets
-train = words[:int(len(words)*TRAINING_SET_RATIO)]
-test = words[int(len(words)*TRAINING_SET_RATIO):]
+train = words[:int(len(words)*TRAINING_SET_RATIO*TOTAL_SET)]
+test = words[int(len(words)*TRAINING_SET_RATIO*TOTAL_SET):int(len(words)*TOTAL_SET)]
 
 # Identify the list of unique terms in the train set
 unique_terms = set()
