@@ -18,47 +18,58 @@ for line in lines:
     label.append(line.strip().split()[0])
     words.append(line.strip().split()[1:])
 
-#Removes punctuation
+# Remove punctuation and words that are only punctuation
+cleaned_words = []
 for tokens in words:
-    tokens = [i.strip("".join(string.punctuation)) for i in tokens if i not in string.punctuation]
-    # print(tokens)
+    cleaned_tokens = [word.strip(string.punctuation) for word in tokens if word.strip(string.punctuation)]
+    cleaned_words.append(cleaned_tokens)
+
+words = cleaned_words
 
 # Split the data into training and test sets
 train = words[:int(len(words)*TRAINING_SET_RATIO)]
 test = words[int(len(words)*TRAINING_SET_RATIO):]
 
-# Calculate term frequency for each document
-def term_frequency(document):
-    tf = defaultdict(int)
-    for word in document:
-        tf[word] += 1
-    return tf
+# Identify the list of unique terms in the train set
+unique_terms = set()
+for tokens in train:
+    unique_terms.update(tokens)
 
-# Calculate document frequency for each term
-def document_frequency(docs):
-    df = defaultdict(int)
-    for doc in docs:
-        unique_terms = set(doc)
-        for term in unique_terms:
-            df[term] += 1
-    return df
+# print("Unique terms in the training set:", unique_terms)
 
-# Calculate inverse document frequency for each term
-def inverse_document_frequency(docs):
-    N = len(docs)
-    df = document_frequency(docs)
-    idf = {}
-    for term, freq in df.items():
-        idf[term] = math.log(N / (1 + freq))
-    return idf
+# Calculate the inverse document frequency (IDF) for each term in the train set
+def calculate_idf(term, train_set):
+    num_docs_with_term = sum(1 for doc in train_set if term in doc)
+    return math.log(len(train_set) / (1 + num_docs_with_term))
 
-# Calculate IDF for the training set
-idf = inverse_document_frequency(train)
-print(idf)
+idf = {term: calculate_idf(term, train) for term in unique_terms}
 
-# Calculate TF for the training set
-tf = term_frequency(train)
+# print("Inverse Document Frequency (IDF) for each term:", idf)
 
-# Calculate TF-IDF for the training set
-tf_idf = td * idf
+# Calculate the term frequency (TF) for each term in a document
+def calculate_tf(term, document):
+    return document.count(term) / len(document)
+
+# Calculate the term frequency for each term in the train set
+train_tf = []
+for doc in train:
+    doc_tf = {term: calculate_tf(term, doc) for term in doc}
+    train_tf.append(doc_tf)
+
+# Calculate the term frequency for each term in the test set
+test_tf = []
+for doc in test:
+    doc_tf = {term: calculate_tf(term, doc) for term in doc}
+    test_tf.append(doc_tf)
+
+# print("Term Frequency (TF) for each term in the training set:", train_tf)
+# print("Term Frequency (TF) for each term in the test set:", test_tf)
+
+# Calculate the TF-IDF for each term in the train set
+train_tfidf = []
+for doc_tf in train_tf:
+    doc_tfidf = {term: tf * idf[term] for term, tf in doc_tf.items()}
+    train_tfidf.append(doc_tfidf)
+
+print("TF-IDF for each term in the training set:", train_tfidf)
 
