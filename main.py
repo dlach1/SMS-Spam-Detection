@@ -5,7 +5,7 @@ import numpy as np
 from collections import defaultdict
 
 TRAINING_SET_RATIO = 0.7
-TOTAL_SET = 0.01
+TOTAL_SET = 1
 
 # Read all the lines in SMSSpamCollection to a list
 file_path = 'SMSSpamCollection'
@@ -68,26 +68,64 @@ for doc in test:
 # print("Term Frequency (TF) for each term in the test set:", test_tf)
 
 # Calculate the TF-IDF for each term in the
-train set
 train_tfidf = []
 for doc_tf in train_tf:
     doc_tfidf = {term: tf * idf[term] for term, tf in doc_tf.items()}
     train_tfidf.append(doc_tfidf)
 
-print("TF-IDF for each term in the training set:", train_tfidf)
 
 def euclidean_distance(vec1, vec2): 
-    return np.sqrt(sum((vec1[term] - vect2[term]) ** 2 for term in vec1))
+    total = 0
+    for term in vec1:
+        if term in vec2:
+            total += (vec1[term] - vec2[term]) ** 2
+    return math.sqrt(total)
 
-def k_nearest_neighbors(train_tf_idf, train_labels, test_vector, k=5):
-    distance = []
+def find_knn(k, test_set, train_tfidf):
+    distances = dict()
+    for i in range(len(train_tfidf)):
+        distances.update({i: euclidean_distance(test_set, train_tfidf[i])})
+    sorted_distances = sorted(distances.items(), key=lambda item: item[1], reverse=True)
+    return sorted_distances[:k]
 
-    for i, train_vector in enumerate(train_tf_idf):
-        distance = euclidean_distance(train_vector, test_vector)
-        distances.append((distance, train_labels[i]))
+TEST_START_INDEX = int(len(words)*TRAINING_SET_RATIO*TOTAL_SET)
+def categorize(k, test_index, train_tfidf):
+    knn = find_knn(5, test_tf[test_index], train_tfidf)
+    total_spam = 0
+    total_ham = 0
+    for i in range(len(knn)):
+        if (label[knn[i][0]] == 'spam'):
+            total_spam += 1
+        elif (label[knn[i][0]] == 'ham'):
+            total_ham += 1 
+    if (total_spam > total_ham):
+        return "spam"
+    return "ham"
 
-    distances.sort(key=lambda x: x[0])
-    k_nearest - distances[:k]
+k = 10
 
-    labels = [label for _, label in k_nearest]
-    return max(set(labels), key=labels.count)
+correct_spam = 0
+correct_ham = 0
+total_spam = 0
+total_ham = 0
+for i in range(0, len(lines)-TEST_START_INDEX):
+    indexed_label = categorize(k, i, train_tfidf)
+
+    if (label[i+TEST_START_INDEX] == "spam"):
+        if (indexed_label == "spam"):
+            correct_spam += 1
+        total_spam += 1
+    elif (label[i+TEST_START_INDEX] == "ham"):
+        if (indexed_label == "ham"):
+            correct_ham += 1
+        total_ham += 1
+
+print("True Positives:", correct_spam)
+print("False Positives:", total_ham - correct_ham)
+print("True Negatives:", correct_ham)
+print("False Negatives:", total_spam - correct_spam)
+
+print("Accuracy:", (correct_spam + correct_ham) / (total_spam + total_ham))
+print("Precision:", correct_spam / total_spam)
+print("Recall:", correct_spam / (correct_spam + total_ham - correct_ham))
+print("F1 Score:", 2 * (correct_spam / total_spam) * (correct_spam / (correct_spam + total_ham - correct_ham)) / ((correct_spam / total_spam) + (correct_spam / (correct_spam + total_ham - correct_ham))))
