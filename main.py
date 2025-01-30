@@ -4,7 +4,7 @@ import math
 import numpy as np
 from collections import defaultdict
 
-TRAINING_SET_RATIO = 0.7
+TRAINING_SET_RATIO = 0.73
 TOTAL_SET = 1
 
 # Read all the lines in SMSSpamCollection to a list
@@ -37,16 +37,12 @@ unique_terms = set()
 for tokens in train:
     unique_terms.update(tokens)
 
-# print("Unique terms in the training set:", unique_terms)
-
 # Calculate the inverse document frequency (IDF) for each term in the train set
 def calculate_idf(term, train_set):
     num_docs_with_term = sum(1 for doc in train_set if term in doc)
     return math.log(len(train_set) / (1 + num_docs_with_term))
 
 idf = {term: calculate_idf(term, train) for term in unique_terms}
-
-# print("Inverse Document Frequency (IDF) for each term:", idf)
 
 # Calculate the term frequency (TF) for each term in a document
 def calculate_tf(term, document):
@@ -63,9 +59,6 @@ test_tf = []
 for doc in test:
     doc_tf = {term: calculate_tf(term, doc) for term in doc}
     test_tf.append(doc_tf)
-
-# print("Term Frequency (TF) for each term in the training set:", train_tf)
-# print("Term Frequency (TF) for each term in the test set:", test_tf)
 
 # Calculate the TF-IDF for each term in the
 train_tfidf = []
@@ -89,20 +82,21 @@ def find_knn(k, test_set, train_tfidf):
     return sorted_distances[:k]
 
 TEST_START_INDEX = int(len(words)*TRAINING_SET_RATIO*TOTAL_SET)
+
 def categorize(k, test_index, train_tfidf):
-    knn = find_knn(5, test_tf[test_index], train_tfidf)
+    knn = find_knn(k, test_tf[test_index], train_tfidf)
     total_spam = 0
     total_ham = 0
     for i in range(len(knn)):
-        if (label[knn[i][0]] == 'spam'):
+        if (label[knn[i][0]] == 'spam' and knn[i][1] != 0):
             total_spam += 1
-        elif (label[knn[i][0]] == 'ham'):
+        elif (label[knn[i][0]] == 'ham' and knn[i][1] != 0):
             total_ham += 1 
-    if (total_spam > total_ham):
-        return "spam"
-    return "ham"
+    if (total_ham > total_spam):
+        return "ham"
+    return "spam"
 
-k = 10
+k = 3
 
 correct_spam = 0
 correct_ham = 0
@@ -119,6 +113,8 @@ for i in range(0, len(lines)-TEST_START_INDEX):
         if (indexed_label == "ham"):
             correct_ham += 1
         total_ham += 1
+    else:
+        "ERROR: Neither spam nor ham"
 
 print("True Positives:", correct_spam)
 print("False Positives:", total_ham - correct_ham)
