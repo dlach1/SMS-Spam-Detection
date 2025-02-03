@@ -12,7 +12,7 @@ line_queue = queue.Queue()
 word_counts = Counter()
 
 # List of stop words to remove
-STOP_WORDS={}
+STOP_WORDS = {}
 
 def process_lines():
     local_counter = Counter()
@@ -32,9 +32,9 @@ def process_lines():
     with threading.Lock():
         word_counts.update(local_counter)
 
-def main(file_path, output_file):
+def get_most_common_words(number_words):
     # Read file and add lines to the queue
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(f'SMSSpamCollection', "r", encoding="utf-8") as f:
         for line in f:
             line_queue.put(line)
 
@@ -49,16 +49,10 @@ def main(file_path, output_file):
     for t in threads:
         t.join()
 
-    # Get the 50 most common words
-    most_common_words = [word for word, _ in word_counts.most_common(1750)]
-
-    # Save to file in Python list syntax
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write(str(most_common_words))
-
-    print(f"Saved the 50 most common words to {output_file}")
+    # Return the 1750 most common words as a set
+    return set(word for word, _ in word_counts.most_common(number_words))
 
 if __name__ == "__main__":
     file_path = r"C:\Users\Garrett\Documents\Class - School\Machine-Learning\ML_Assignment1\SMSSpamCollection"
-    output_file = r"C:\Users\Garrett\Documents\Class - School\Machine-Learning\ML_Assignment1\top_words.py"
-    main(file_path, output_file)
+    top_words_set = get_most_common_words(file_path)
+    print(top_words_set)  # Print or use the set as needed
