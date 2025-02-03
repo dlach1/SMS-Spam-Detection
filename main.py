@@ -3,9 +3,12 @@ import email
 import math
 import numpy as np
 from collections import defaultdict
+import re
 
 TRAINING_SET_RATIO = 0.73
 TOTAL_SET = 1
+STOP_WORDS = {'it', 'from', 'the', 'is', 'in', 'now', 'this', 'have', 'a', 'on', 'to', 'and', 'our', 'has', 'up', 'with', 'are', 'will', 'we', 'for'}
+CURRENCY_CHARACTERS = ['$', '€', '£', '¥', '₹', '₩', '₽', '₺', '฿', '₫', '₴', '₦', '₲', '₵', '₡', '₱', '₭', '₮', '₦', '₳', '₣', '₤', '₧', '₯']
 
 # Read all the lines in SMSSpamCollection to a list
 file_path = 'SMSSpamCollection'
@@ -20,13 +23,15 @@ for line in lines:
     label.append(line.strip().split()[0])
     words.append(line.strip().split()[1:])
 
-# Remove punctuation and words that are only punctuation
-cleaned_words = []
-for tokens in words:
-    cleaned_tokens = [word.strip(string.punctuation) for word in tokens if word.strip(string.punctuation)]
-    cleaned_words.append(cleaned_tokens)
+def replace_digits(word):
+    return re.sub(r'\d{4,}', lambda x: '1' * len(x.group()), word)
+words = [[replace_digits(word) for word in word_list] for word_list in words]
 
-words = cleaned_words
+def replace_currency(word):
+    for char in CURRENCY_CHARACTERS:
+        word = word.replace(char, '$')
+    return word
+words = [[replace_currency(word) for word in word_list] for word_list in words]
 
 # Split the data into training and test sets
 train = words[:int(len(words)*TRAINING_SET_RATIO*TOTAL_SET)]
@@ -96,7 +101,7 @@ def categorize(k, test_index, train_tfidf):
         return "ham"
     return "spam"
 
-k = 3
+k = 5
 
 correct_spam = 0
 correct_ham = 0
