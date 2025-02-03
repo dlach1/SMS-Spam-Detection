@@ -1,7 +1,6 @@
 import threading
 from collections import Counter
 import queue
-import json
 
 # Number of threads to use
 NUM_THREADS = 4
@@ -12,8 +11,14 @@ line_queue = queue.Queue()
 # Dictionary to store word counts (thread-safe)
 word_counts = Counter()
 
-# Define stop words to ignore
-# STOP_WORDS = {"and", "the", "but", "or", "if", "so", "it"}
+# List of stop words to remove
+STOP_WORDS={}
+# STOP_WORDS = {
+#     "and", "the", "but", "or", "if", "so", "it", "a", "to", "of", "in", "for", "on", 
+#     "with", "as", "this", "that", "at", "by", "from", "was", "is", "are", "be", "an", 
+#     "we", "he", "she", "they", "you", "i", "me", "my", "mine", "our", "ours", "your", 
+#     "yours", "their", "theirs", "his", "her", "hers", "its"
+# }
 
 def process_lines():
     local_counter = Counter()
@@ -24,7 +29,7 @@ def process_lines():
             break  # Exit if the queue is empty
 
         words = line.strip().split()[1:]  # Skip the first word (ham/spam)
-        words = [word.lower() for word in words]  # Convert to lowercase & filter
+        words = [word.lower() for word in words if word.lower() not in STOP_WORDS]  # Convert to lowercase & filter
 
         local_counter.update(words)  # Count words locally
 
@@ -33,7 +38,7 @@ def process_lines():
     with threading.Lock():
         word_counts.update(local_counter)
 
-def main(file_path, output_json):
+def main(file_path, output_file):
     # Read file and add lines to the queue
     with open(file_path, "r", encoding="utf-8") as f:
         for line in f:
@@ -50,16 +55,16 @@ def main(file_path, output_json):
     for t in threads:
         t.join()
 
-    # Get the 100 most common words
-    most_common_words = dict(word_counts.most_common(100))
+    # Get the 50 most common words
+    most_common_words = [word for word, _ in word_counts.most_common(200)]
 
-    # Save to JSON file
-    with open(output_json, "w", encoding="utf-8") as json_file:
-        json.dump(most_common_words, json_file, indent=4)
+    # Save to file in Python list syntax
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(str(most_common_words))
 
-    print(f"Saved the 100 most common words to {output_json}")
+    print(f"Saved the 50 most common words to {output_file}")
 
 if __name__ == "__main__":
-    file_path = r"SMSSpamCollection.txt"
-    output_json = r"C:\Users\Garrett\Documents\Class - School\Machine-Learning\ML_Assignment1\word_counts.json"
-    main(file_path, output_json)
+    file_path = r"C:\Users\Garrett\Documents\Class - School\Machine-Learning\ML_Assignment1\SMSSpamCollection"
+    output_file = r"C:\Users\Garrett\Documents\Class - School\Machine-Learning\ML_Assignment1\top_words.py"
+    main(file_path, output_file)
