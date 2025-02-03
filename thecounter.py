@@ -13,12 +13,6 @@ word_counts = Counter()
 
 # List of stop words to remove
 STOP_WORDS={}
-# STOP_WORDS = {
-#     "and", "the", "but", "or", "if", "so", "it", "a", "to", "of", "in", "for", "on", 
-#     "with", "as", "this", "that", "at", "by", "from", "was", "is", "are", "be", "an", 
-#     "we", "he", "she", "they", "you", "i", "me", "my", "mine", "our", "ours", "your", 
-#     "yours", "their", "theirs", "his", "her", "hers", "its"
-# }
 
 def process_lines():
     local_counter = Counter()
@@ -56,7 +50,7 @@ def main(file_path, output_file):
         t.join()
 
     # Get the 50 most common words
-    most_common_words = [word for word, _ in word_counts.most_common(200)]
+    most_common_words = [word for word, _ in word_counts.most_common(1750)]
 
     # Save to file in Python list syntax
     with open(output_file, "w", encoding="utf-8") as f:
