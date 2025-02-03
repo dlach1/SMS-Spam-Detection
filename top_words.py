@@ -1,0 +1,1 @@
+['u', 'have', 'call', '2', 'not', 'ur', 'can', 'will', "i'm", 'get', 'just', 'do', 'when', '&lt;#&gt;', 'go', 'up', 'all', 'no', '4', 'how', 'what', 'now', '.', 'like', 'got', 'know', 'free', 'out', 'come', 'am', 'then', 'good', 'send', '?', 'only', 'want', 'text', 'time', "i'll", 'love', '...', 'going', 'ok', 'ü', 'need', 'about', 'r', 'still', 'one', 'txt']
