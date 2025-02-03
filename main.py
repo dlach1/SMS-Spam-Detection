@@ -1,8 +1,4 @@
-import string
-import email
 import math
-import numpy as np
-from collections import defaultdict
 import re
 
 TRAINING_SET_RATIO = 0.7
@@ -98,7 +94,7 @@ def find_knn(k, test_set, train_tfidf):
 
 TEST_START_INDEX = int(len(words)*TRAINING_SET_RATIO*TOTAL_SET)
 
-def categorize(k, test_index, train_tfidf):
+def categorize_knn(k, test_index, train_tfidf):
     knn = find_knn(k, test_tf[test_index], train_tfidf)
     total_spam = 0
     total_ham = 0
@@ -118,7 +114,7 @@ correct_ham = 0
 total_spam = 0
 total_ham = 0
 for i in range(0, len(lines)-TEST_START_INDEX):
-    indexed_label = categorize(k, i, train_tfidf)
+    indexed_label = categorize_knn(k, i, train_tfidf)
 
     if (label[i+TEST_START_INDEX] == "spam"):
         if (indexed_label == "spam"):
