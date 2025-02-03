@@ -7,7 +7,7 @@ import re
 
 TRAINING_SET_RATIO = 0.73
 TOTAL_SET = 1
-STOP_WORDS = {'it', 'from', 'the', 'is', 'in', 'now', 'this', 'have', 'a', 'on', 'to', 'and', 'our', 'has', 'up', 'with', 'are', 'will', 'we', 'for'}
+STOP_WORDS = {'to', 'i', 'you', 'a', 'the', 'u', 'and', 'is', 'in', 'my', 'for','your', 'of', 'me'}
 CURRENCY_CHARACTERS = ['$', '€', '£', '¥', '₹', '₩', '₽', '₺', '฿', '₫', '₴', '₦', '₲', '₵', '₡', '₱', '₭', '₮', '₦', '₳', '₣', '₤', '₧', '₯']
 
 # Read all the lines in SMSSpamCollection to a list
@@ -32,6 +32,16 @@ def replace_currency(word):
         word = word.replace(char, '$')
     return word
 words = [[replace_currency(word) for word in word_list] for word_list in words]
+
+def lowercase(word):
+    return word.lower()
+words = [[lowercase(word) for word in word_list] for word_list in words]
+
+def remove_common(word):
+    return word if word not in STOP_WORDS else ""
+words = [[remove_common(word) for word in word_list] for word_list in words]
+
+
 
 # Split the data into training and test sets
 train = words[:int(len(words)*TRAINING_SET_RATIO*TOTAL_SET)]
