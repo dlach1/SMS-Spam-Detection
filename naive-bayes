@@ -1,12 +1,8 @@
 import math
-import numpy as np
-import thecounter
-from collections import defaultdict
 import re
 
 TRAINING_SET_RATIO = 0.7
 TOTAL_SET = 1
-STOP_WORDS = thecounter.get_most_common_words(1750)
 CURRENCY_CHARACTERS = ['$', '€', '£', '¥', '₹', '₩', '₽', '₺', '฿', '₫', '₴', '₦', '₲', '₵', '₡', '₱', '₭', '₮', '₦', '₳', '₣', '₤', '₧', '₯']
 
 # Read all the lines in SMSSpamCollection to a list
@@ -36,12 +32,6 @@ def lowercase(word):
     return word.lower()
 words = [[lowercase(word) for word in word_list] for word_list in words]
 
-def remove_common(word):
-    return word if word not in STOP_WORDS else ""
-words = [[remove_common(word) for word in word_list] for word_list in words]
-
-
-
 # Split the data into training and test sets
 train = words[:int(len(words)*TRAINING_SET_RATIO*TOTAL_SET)]
 test = words[int(len(words)*TRAINING_SET_RATIO*TOTAL_SET):int(len(words)*TOTAL_SET)]
@@ -51,73 +41,50 @@ unique_terms = set()
 for tokens in train:
     unique_terms.update(tokens)
 
-# Calculate the inverse document frequency (IDF) for each term in the train set
-def calculate_idf(term, train_set):
-    num_docs_with_term = sum(1 for doc in train_set if term in doc)
-    return math.log(len(train_set) / (1 + num_docs_with_term))
+# Create dictionaries to count occurrences in spam and ham
+spam_counts = {term: 0 for term in unique_terms}
+ham_counts = {term: 0 for term in unique_terms}
+total_counts = {term: 0 for term in unique_terms}
 
-idf = {term: calculate_idf(term, train) for term in unique_terms}
+for i, tokens in enumerate(train):
+    if label[i] == 'spam':
+        for token in tokens:
+            spam_counts[token] += 1
+            total_counts[token] += 1
+    else:
+        for token in tokens:
+            ham_counts[token] += 1
+            total_counts[token] += 1
 
-# Calculate the term frequency (TF) for each term in a document
-def calculate_tf(term, document):
-    return document.count(term) / len(document)
-
-# Calculate the term frequency for each term in the train set
-train_tf = []
-for doc in train:
-    doc_tf = {term: calculate_tf(term, doc) for term in doc}
-    train_tf.append(doc_tf)
-
-# Calculate the term frequency for each term in the test set
-test_tf = []
-for doc in test:
-    doc_tf = {term: calculate_tf(term, doc) for term in doc}
-    test_tf.append(doc_tf)
-
-# Calculate the TF-IDF for each term in the
-train_tfidf = []
-for doc_tf in train_tf:
-    doc_tfidf = {term: tf * idf[term] for term, tf in doc_tf.items()}
-    train_tfidf.append(doc_tfidf)
-
-
-def euclidean_distance(vec1, vec2): 
-    total = 0
-    for term in vec1:
-        if term in vec2:
-            total += (vec1[term] - vec2[term]) ** 2
-    return math.sqrt(total)
-
-def find_knn(k, test_set, train_tfidf):
-    distances = dict()
-    for i in range(len(train_tfidf)):
-        distances.update({i: euclidean_distance(test_set, train_tfidf[i])})
-    sorted_distances = sorted(distances.items(), key=lambda item: item[1], reverse=True)
-    return sorted_distances[:k]
+prob_spam = {term: 0 for term in unique_terms}
+prob_ham = {term: 0 for term in unique_terms}
+for term in unique_terms:
+    prob_spam[term] = spam_counts[term] / total_counts[term]
+    prob_ham[term] = ham_counts[term] / total_counts[term]
 
 TEST_START_INDEX = int(len(words)*TRAINING_SET_RATIO*TOTAL_SET)
 
-def categorize_knn(k, test_index, train_tfidf):
-    knn = find_knn(k, test_tf[test_index], train_tfidf)
-    total_spam = 0
-    total_ham = 0
-    for i in range(len(knn)):
-        if (label[knn[i][0]] == 'spam' and knn[i][1] != 0):
-            total_spam += 1
-        elif (label[knn[i][0]] == 'ham' and knn[i][1] != 0):
-            total_ham += 1 
-    if (total_ham > total_spam):
-        return "ham"
-    return "spam"
+def classify(tokens, prob_spam, prob_ham):
+    spam_probability = 1.0
+    ham_probability = 1.0
+    for word in tokens:
+        if word in unique_terms:
+            ham_probability *= prob_ham[word]
+            spam_probability *= prob_spam[word]
 
-k = 5
+    if spam_probability > ham_probability:
+        return 'spam'
+    else:
+        return 'ham'
+    
+
 
 correct_spam = 0
 correct_ham = 0
 total_spam = 0
 total_ham = 0
 for i in range(0, len(lines)-TEST_START_INDEX):
-    indexed_label = categorize_knn(k, i, train_tfidf)
+    indexed_label = classify(test[i], prob_spam, prob_ham)
 
     if (label[i+TEST_START_INDEX] == "spam"):
         if (indexed_label == "spam"):
