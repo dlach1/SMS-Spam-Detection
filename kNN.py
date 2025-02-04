@@ -4,8 +4,9 @@ import thecounter
 from collections import defaultdict
 import re
 
+# Define the constants for the kNN model 
+# These include the training set ratio, the stop words (words to not be looked at), and the currency characters
 TRAINING_SET_RATIO = 0.7
-TOTAL_SET = 1
 STOP_WORDS = thecounter.get_most_common_words(1750)
 CURRENCY_CHARACTERS = ['$', '€', '£', '¥', '₹', '₩', '₽', '₺', '฿', '₫', '₴', '₦', '₲', '₵', '₡', '₱', '₭', '₮', '₦', '₳', '₣', '₤', '₧', '₯']
 
@@ -22,20 +23,26 @@ for line in lines:
     label.append(line.strip().split()[0])
     words.append(line.strip().split()[1:])
 
+#Beginning of tokenization
+
+#Replace all of the digits in the words with the number 1
 def replace_digits(word):
     return re.sub(r'\d{4,}', lambda x: '1' * len(x.group()), word)
 words = [[replace_digits(word) for word in word_list] for word_list in words]
 
+#Replace all of the currency characters with the dollar sign
 def replace_currency(word):
     for char in CURRENCY_CHARACTERS:
         word = word.replace(char, '$')
     return word
 words = [[replace_currency(word) for word in word_list] for word_list in words]
 
+#Convert all of the words to lowercase
 def lowercase(word):
     return word.lower()
 words = [[lowercase(word) for word in word_list] for word_list in words]
 
+#Remove all of the common words from the list of words
 def remove_common(word):
     return word if word not in STOP_WORDS else ""
 words = [[remove_common(word) for word in word_list] for word_list in words]
@@ -43,8 +50,8 @@ words = [[remove_common(word) for word in word_list] for word_list in words]
 
 
 # Split the data into training and test sets
-train = words[:int(len(words)*TRAINING_SET_RATIO*TOTAL_SET)]
-test = words[int(len(words)*TRAINING_SET_RATIO*TOTAL_SET):int(len(words)*TOTAL_SET)]
+train = words[:int(len(words)*TRAINING_SET_RATIO)]
+test = words[int(len(words)*TRAINING_SET_RATIO):]
 
 # Identify the list of unique terms in the train set
 unique_terms = set()
@@ -80,7 +87,7 @@ for doc_tf in train_tf:
     doc_tfidf = {term: tf * idf[term] for term, tf in doc_tf.items()}
     train_tfidf.append(doc_tfidf)
 
-
+# Calculate the Euclidean distance between two vectors
 def euclidean_distance(vec1, vec2): 
     total = 0
     for term in vec1:
@@ -88,6 +95,7 @@ def euclidean_distance(vec1, vec2):
             total += (vec1[term] - vec2[term]) ** 2
     return math.sqrt(total)
 
+# Find the k nearest neighbors of a test set in the training set
 def find_knn(k, test_set, train_tfidf):
     distances = dict()
     for i in range(len(train_tfidf)):
@@ -95,8 +103,9 @@ def find_knn(k, test_set, train_tfidf):
     sorted_distances = sorted(distances.items(), key=lambda item: item[1], reverse=True)
     return sorted_distances[:k]
 
-TEST_START_INDEX = int(len(words)*TRAINING_SET_RATIO*TOTAL_SET)
+TEST_START_INDEX = int(len(words)*TRAINING_SET_RATIO)
 
+# Categorize a test set using kNN
 def categorize_knn(k, test_index, train_tfidf):
     knn = find_knn(k, test_tf[test_index], train_tfidf)
     total_spam = 0
@@ -110,8 +119,10 @@ def categorize_knn(k, test_index, train_tfidf):
         return "ham"
     return "spam"
 
+# Define the k-value for kNN
 k = 5
 
+# Evaluate the kNN model using the test set
 correct_spam = 0
 correct_ham = 0
 total_spam = 0
