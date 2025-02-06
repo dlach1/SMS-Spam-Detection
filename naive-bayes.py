@@ -1,3 +1,4 @@
+# Dan Lechance, Garret , Hal Williams 
 import math
 import re
 
