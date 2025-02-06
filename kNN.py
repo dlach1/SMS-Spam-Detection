@@ -1,5 +1,9 @@
 # Dan Lechance, Garrett Thompson , Hal Williams 
-# Also thank you OpenAI ChatGPT and Microsoft Copilot
+# 
+# AI Usage Statement
+# Tools Used: Copilot
+# - Usage: 
+# Prohibited Use Compliance: Confirmed
 import math
 import thecounter
 import re

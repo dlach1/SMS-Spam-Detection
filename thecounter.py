@@ -1,5 +1,9 @@
 # Garrett Thompson
-# Massive Thank you to Microsoft CoPilot
+# 
+# AI Usage Statement
+# Tools Used: Copilot
+# - Usage: 
+# Prohibited Use Compliance: Confirmed
 import threading
 from collections import Counter
 import queue
