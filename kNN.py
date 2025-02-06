@@ -1,4 +1,4 @@
-# Dan Lechance, Garret , Hal Williams 
+# Dan Lechance, Garrett Thompson , Hal Williams 
 # Also thank you OpenAI ChatGPT and Microsoft Copilot
 import math
 import thecounter

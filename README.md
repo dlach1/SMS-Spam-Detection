@@ -1,5 +1,5 @@
 # SMS Spam Detector
-Dan Lachance, Garret , Hal Williams 
+Dan Lachance, Garrett Thompson , Hal Williams 
 
 ## Requirements
 Must use python 3 to execute all code 

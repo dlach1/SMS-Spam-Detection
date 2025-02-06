@@ -1,5 +1,5 @@
-# Garret
-# Also Thank you Microsoft CoPilot
+# Garrett Thompson
+# Massive Thank you to Microsoft CoPilot
 import threading
 from collections import Counter
 import queue
