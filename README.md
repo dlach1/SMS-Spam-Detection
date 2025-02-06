@@ -5,4 +5,4 @@ Dan Lechance, Hal Williams
 Must use python 3 to execute all code
 
 Install matplotlib with pip
-``` pip install matplotlib ```
+\n``` pip install matplotlib ```
