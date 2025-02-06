@@ -1,8 +1,11 @@
 # Garrett Thompson
 # 
 # AI Usage Statement
-# Tools Used: Copilot
-# - Usage: 
+# Tools Used: ChatGPT
+# 
+# - Usage: Gave it a simple word counting script written in python and told it to keep its purpose and function 
+# the same but make it multi-threaded to help deal with the massive word list
+
 # Prohibited Use Compliance: Confirmed
 import threading
 from collections import Counter
@@ -17,9 +20,6 @@ line_queue = queue.Queue()
 # Dictionary to store word counts (thread-safe)
 word_counts = Counter()
 
-# List of stop words to remove
-STOP_WORDS = {}
-
 def process_lines():
     local_counter = Counter()
     while True:
@@ -29,7 +29,7 @@ def process_lines():
             break  # Exit if the queue is empty
 
         words = line.strip().split()[1:]  # Skip the first word (ham/spam)
-        words = [word.lower() for word in words if word.lower() not in STOP_WORDS]  # Convert to lowercase & filter
+        words = [word.lower() for word in words if word.lower()]  # Convert to lowercase & filter
 
         local_counter.update(words)  # Count words locally
 
