@@ -3,6 +3,7 @@
 # AI Usage Statement
 # Tools Used: Copilot
 # - Usage: 
+# - Verification: Manual testing with using cmd-f to count accuracy
 # Prohibited Use Compliance: Confirmed
 import threading
 from collections import Counter

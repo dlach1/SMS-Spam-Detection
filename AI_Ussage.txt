@@ -1,0 +1,24 @@
+AI Usage Statement
+CoPilot - kNN.py
+
+Usage: Assistance in Writing: find_knn function, and distance functions
+
+Verification: Testing of each function writen to obtain expected results
+
+CoPilot - thecounter.py
+
+Usage: Assisted
+
+Verification: Manual Testing of Expected Results
+
+CoPilot - README.md
+
+Usage: Assisted in making headers and code blocks
+
+Verification: None needed
+
+
+Prohibited Use Compliance: 
+I confirm this work adheres to course AI policies, 
+with no unauthorized use in assessments/quizzes/exams. 
+All AI-assisted components meet required substantial modification standards.
