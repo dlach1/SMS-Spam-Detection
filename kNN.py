@@ -2,7 +2,7 @@
 # 
 # AI Usage Statement
 # Tools Used: Copilot
-# - Usage: 
+# - Usage: Assistance in Writing: find_knn function, and distance functions
 # Prohibited Use Compliance: Confirmed
 import math
 import thecounter

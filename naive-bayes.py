@@ -1,7 +1,6 @@
 # Dan Lechance, Garrett Thompson , Hal Williams 
 # AI Usage Statement
-# Tools Used: CoPilot
-# - Usage: 
+# Tools Used: None
 # Prohibited Use Compliance: Confirmed
 import math
 import re
