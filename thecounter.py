@@ -2,7 +2,8 @@
 # 
 # AI Usage Statement
 # Tools Used: Copilot
-# - Usage: 
+# - Usage: Gave it a simple word counting script written in python and told it to keep its purpose and function 
+#           the same but make it multi-threaded to help deal with the massive word list
 # - Verification: Manual testing with using cmd-f to count accuracy
 # Prohibited Use Compliance: Confirmed
 import threading
