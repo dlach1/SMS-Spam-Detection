@@ -3,10 +3,13 @@ import thecounter
 import re
 import matplotlib.pyplot as plt
 
+
+num_stop_words = int(input("Please Enter The Number of Stop Words"))
+
 # Define the constants for the kNN model 
 # These include the training set ratio, the stop words (words to not be looked at), and the currency characters
 TRAINING_SET_RATIO = 0.7
-STOP_WORDS = thecounter.get_most_common_words(50)
+STOP_WORDS = thecounter.get_most_common_words(num_stop_words)
 CURRENCY_CHARACTERS = ['$', '€', '£', '¥', '₹', '₩', '₽', '₺', '฿', '₫', '₴', '₦', '₲', '₵', '₡', '₱', '₭', '₮', '₦', '₳', '₣', '₤', '₧', '₯']
 
 # Read all the lines in SMSSpamCollection to a list
