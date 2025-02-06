@@ -2,5 +2,7 @@
 Dan Lechance, Hal Williams
 
 ## Requirements
-'''bash
-pip install matplotlib
+Must use python 3 to execute all code
+
+Install matplotlib with pip
+' pip install matplotlib '
