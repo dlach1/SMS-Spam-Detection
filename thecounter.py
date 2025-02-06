@@ -53,6 +53,6 @@ def get_most_common_words(number_words):
     return set(word for word, _ in word_counts.most_common(number_words))
 
 if __name__ == "__main__":
-    file_path = r"C:\Users\Garrett\Documents\Class - School\Machine-Learning\ML_Assignment1\SMSSpamCollection"
+    file_path = r"./SMSSpamCollection"
     top_words_set = get_most_common_words(file_path)
     print(top_words_set)  # Print or use the set as needed

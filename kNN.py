@@ -1,13 +1,12 @@
 import math
-import numpy as np
 import thecounter
-from collections import defaultdict
 import re
+import matplotlib.pyplot as plt
 
 # Define the constants for the kNN model 
 # These include the training set ratio, the stop words (words to not be looked at), and the currency characters
 TRAINING_SET_RATIO = 0.7
-STOP_WORDS = thecounter.get_most_common_words(1750)
+STOP_WORDS = thecounter.get_most_common_words(50)
 CURRENCY_CHARACTERS = ['$', '€', '£', '¥', '₹', '₩', '₽', '₺', '฿', '₫', '₴', '₦', '₲', '₵', '₡', '₱', '₭', '₮', '₦', '₳', '₣', '₤', '₧', '₯']
 
 # Read all the lines in SMSSpamCollection to a list
@@ -95,19 +94,35 @@ def euclidean_distance(vec1, vec2):
             total += (vec1[term] - vec2[term]) ** 2
     return math.sqrt(total)
 
+# Calculate the Manhattan distance between two vectors
+def manhattan_distance(vec1, vec2):
+    total = 0
+    for term in vec1:
+        if term in vec2:
+            total += abs(vec1[term] - vec2[term])
+    return total
+
+# Calculate the Minkowski distance between two vectors
+def minkowski_distance(vec1, vec2):
+    total = 0
+    for term in vec1:
+        if term in vec2:
+            total += abs(vec1[term] - vec2[term]) ** 3
+    return total ** (1 / 3)
+
 # Find the k nearest neighbors of a test set in the training set
-def find_knn(k, test_set, train_tfidf):
+def find_knn(k, test_set, train_tfidf, distance_function=euclidean_distance):
     distances = dict()
     for i in range(len(train_tfidf)):
-        distances.update({i: euclidean_distance(test_set, train_tfidf[i])})
+        distances.update({i: distance_function(test_set, train_tfidf[i])})
     sorted_distances = sorted(distances.items(), key=lambda item: item[1], reverse=True)
     return sorted_distances[:k]
 
 TEST_START_INDEX = int(len(words)*TRAINING_SET_RATIO)
 
 # Categorize a test set using kNN
-def categorize_knn(k, test_index, train_tfidf):
-    knn = find_knn(k, test_tf[test_index], train_tfidf)
+def categorize_knn(k, test_index, train_tfidf, distance_function=euclidean_distance):
+    knn = find_knn(k, test_tf[test_index], train_tfidf, distance_function)
     total_spam = 0
     total_ham = 0
     for i in range(len(knn)):
@@ -119,34 +134,66 @@ def categorize_knn(k, test_index, train_tfidf):
         return "ham"
     return "spam"
 
-# Define the k-value for kNN
-k = 5
-
 # Evaluate the kNN model using the test set
-correct_spam = 0
-correct_ham = 0
-total_spam = 0
-total_ham = 0
-for i in range(0, len(lines)-TEST_START_INDEX):
-    indexed_label = categorize_knn(k, i, train_tfidf)
+def evaluate(k, print_results=True, distance_function=euclidean_distance):
+    correct_spam = 0
+    correct_ham = 0
+    total_spam = 0
+    total_ham = 0
+    for i in range(0, len(lines)-TEST_START_INDEX):
+        indexed_label = categorize_knn(k, i, train_tfidf, distance_function)
 
-    if (label[i+TEST_START_INDEX] == "spam"):
-        if (indexed_label == "spam"):
-            correct_spam += 1
-        total_spam += 1
-    elif (label[i+TEST_START_INDEX] == "ham"):
-        if (indexed_label == "ham"):
-            correct_ham += 1
-        total_ham += 1
-    else:
-        "ERROR: Neither spam nor ham"
+        if (label[i+TEST_START_INDEX] == "spam"):
+            if (indexed_label == "spam"):
+                correct_spam += 1
+            total_spam += 1
+        elif (label[i+TEST_START_INDEX] == "ham"):
+            if (indexed_label == "ham"):
+                correct_ham += 1
+            total_ham += 1
+        else:
+            "ERROR: Neither spam nor ham"
 
-print("True Positives:", correct_spam)
-print("False Positives:", total_ham - correct_ham)
-print("True Negatives:", correct_ham)
-print("False Negatives:", total_spam - correct_spam)
+    F1_Score = 2 * (correct_spam / total_spam) * (correct_spam / (correct_spam + total_ham - correct_ham)) / ((correct_spam / total_spam) + (correct_spam / (correct_spam + total_ham - correct_ham)))
+    if print_results:
+        print("True Positives:", correct_spam)
+        print("False Positives:", total_ham - correct_ham)
+        print("True Negatives:", correct_ham)
+        print("False Negatives:", total_spam - correct_spam)
 
-print("Accuracy:", (correct_spam + correct_ham) / (total_spam + total_ham))
-print("Precision:", correct_spam / total_spam)
-print("Recall:", correct_spam / (correct_spam + total_ham - correct_ham))
-print("F1 Score:", 2 * (correct_spam / total_spam) * (correct_spam / (correct_spam + total_ham - correct_ham)) / ((correct_spam / total_spam) + (correct_spam / (correct_spam + total_ham - correct_ham))))
+        print("Accuracy:", (correct_spam + correct_ham) / (total_spam + total_ham))
+        print("Precision:", correct_spam / total_spam)
+        print("Recall:", correct_spam / (correct_spam + total_ham - correct_ham))
+        print("F1 Score:", F1_Score)
+    return F1_Score
+
+# print("Euclidean Distance")
+# evaluate(5, True, euclidean_distance)
+# print("\nManhattan Distance")
+# evaluate(5, True, manhattan_distance)
+# print("\nMinkowski Distance")
+# evaluate(5, True, minkowski_distance)
+
+manhattan_results = []
+euclidean_results = []
+minkowski_results = []
+
+for i in range(1, 16, 2):
+    manhattan_results.append(evaluate(i, False, manhattan_distance))
+    euclidean_results.append(evaluate(i, False, euclidean_distance))
+    minkowski_results.append(evaluate(i, False, minkowski_distance))
+    print("k =", i, "done")
+
+# Plot the results using matplotlib
+k_values = [i for i in range(1, 16, 2)]
+
+plt.plot(k_values, manhattan_results, label='Manhattan Distance', marker='o')
+plt.plot(k_values, euclidean_results, label='Euclidean Distance', marker='x')
+plt.plot(k_values, minkowski_results, label='Minkowski Distance', marker='^')
+plt.ylim(0.1, 1)
+plt.xlabel('k')
+plt.ylabel('F1 Score')
+plt.title('F1 Score vs k for Manhattan, Euclidean, and Minkowski (p=3) Distances')
+plt.legend()
+plt.grid(True)
+plt.show()
