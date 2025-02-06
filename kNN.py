@@ -3,7 +3,6 @@
 import math
 import thecounter
 import re
-import matplotlib.pyplot as plt
 
 
 num_stop_words = int(input("Please Enter The Number of Stop Words"))
@@ -172,33 +171,5 @@ def evaluate(k, print_results=True, distance_function=euclidean_distance):
         print("F1 Score:", F1_Score)
     return F1_Score
 
-# print("Euclidean Distance")
-# evaluate(5, True, euclidean_distance)
-# print("\nManhattan Distance")
-# evaluate(5, True, manhattan_distance)
-# print("\nMinkowski Distance")
-# evaluate(5, True, minkowski_distance)
-
-manhattan_results = []
-euclidean_results = []
-minkowski_results = []
-
-for i in range(1, 16, 2):
-    manhattan_results.append(evaluate(i, False, manhattan_distance))
-    euclidean_results.append(evaluate(i, False, euclidean_distance))
-    minkowski_results.append(evaluate(i, False, minkowski_distance))
-    print("k =", i, "done")
-
-# Plot the results using matplotlib
-k_values = [i for i in range(1, 16, 2)]
-
-plt.plot(k_values, manhattan_results, label='Manhattan Distance', marker='o')
-plt.plot(k_values, euclidean_results, label='Euclidean Distance', marker='x')
-plt.plot(k_values, minkowski_results, label='Minkowski Distance', marker='^')
-plt.ylim(0.1, 1)
-plt.xlabel('k')
-plt.ylabel('F1 Score')
-plt.title('F1 Score vs k for Manhattan, Euclidean, and Minkowski (p=3) Distances')
-plt.legend()
-plt.grid(True)
-plt.show()
+print("Euclidean Distance")
+evaluate(5, True, euclidean_distance)
