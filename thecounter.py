@@ -6,7 +6,9 @@
 # - Usage: Gave it a simple word counting script written in python and told it to keep its purpose and function 
 # the same but make it multi-threaded to help deal with the massive word list
 
-# Prohibited Use Compliance: Confirmed
+# Prohibited Use Compliance: 
+# Used AI only to enhance some of my code that I made myself, 
+# and thus understands its non important/technical function it provides to the program.
 import threading
 from collections import Counter
 import queue
